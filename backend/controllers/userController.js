@@ -10,7 +10,7 @@ export const home = async (req, res) => {
     }
 };
 
-export const signUp = async (req, res) => {
+export const signUp = async (req, res, next) => {
     try {
         const {userName, email, password} = req.body;
         const hashedPassword = bcryptjs.hashSync(password, 10);
@@ -18,8 +18,7 @@ export const signUp = async (req, res) => {
         await newUser.save();
         res.status(201).json({message:"user registered successfully"});
     } catch (error) {
-        res.status(500).json({messagge:"error registering user:", error})
-        console.log("error registering user", error);
+        next(error);
     }
 };
 

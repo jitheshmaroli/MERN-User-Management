@@ -74,7 +74,7 @@ const Register = () => {
         <div className='flex mt-3'>
             <p>Have an account?</p>
             <Link 
-                to='/signin' 
+                to='/sign-in' 
             >
                 <span className='text-blue-500'>Sign In</span>
             </Link>

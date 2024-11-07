@@ -1,11 +1,14 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
+import { signInStart, signInSuccess, signInFailure } from '../redux/user/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Login = () => {
     const [formData, setFormData] = useState({});
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(false);
+    const {loading, error} = useSelector((state) => state.user);
+    console.log(loading, error);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     
     const handleChange = (e) => {
         setFormData({...formData, [e.target.id] : e.target.value})
@@ -14,8 +17,7 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
        try {
-           setLoading(true);
-           setError(false);
+            dispatch(signInStart());
             const response = await fetch("/api/auth/sign-in", {
                 method: 'POST',
                 headers: {
@@ -24,15 +26,14 @@ const Login = () => {
                  body: JSON.stringify(formData),
             });
             const data = await response.json();
-            setLoading(false);
             if(data.success === false) {
-                setError(true);
+                dispatch(signInFailure(data));
                 return;
             }
+            dispatch(signInSuccess(data));
             navigate('/');
        } catch (error) {
-            setLoading(false);
-            setError(true);
+            dispatch(signInFailure(error));
        }
     }
 
@@ -41,7 +42,7 @@ const Login = () => {
         <h1 className='text-3xl text-center font-semibold my-7'>
             Sign In
         </h1>
-        <p className='text-red-800 my-4 text-center'>{error && "something went wrong"}</p>
+        <p className='text-red-800 my-4 text-center'>{error ? error.message || "something went wrong" : ''}</p>
         <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
             <input 
                 type="email"

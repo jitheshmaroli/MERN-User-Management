@@ -1,11 +1,12 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom';
 
 const Register = () => {
     const [formData, setFormData] = useState({});
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
-    
+    const navigate = useNavigate();
+
     const handleChange = (e) => {
         setFormData({...formData, [e.target.id] : e.target.value})
     }
@@ -28,12 +29,12 @@ const Register = () => {
                 setError(true);
                 return;
             }
+            navigate('/sign-in');
        } catch (error) {
             setLoading(false);
             setError(true);
        }
     }
-    console.log(formData)
   return (
     <div className='p-3 max-w-lg mx-auto'>
         <h1 className='text-3xl text-center font-semibold my-7'>

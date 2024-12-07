@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import { signInStart, signInSuccess, signInFailure } from '../redux/user/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -6,16 +6,28 @@ import { useDispatch, useSelector } from 'react-redux';
 const Login = () => {
     const [formData, setFormData] = useState({});
     const {loading, error} = useSelector((state) => state.user);
-    console.log(loading, error);
+    const [formErrors, setFormErrors] = useState({});
     const navigate = useNavigate();
     const dispatch = useDispatch();
     
     const handleChange = (e) => {
         setFormData({...formData, [e.target.id] : e.target.value})
-    }
+    };
+
+    const validateForm = () => {
+        let errors = {};
+        if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) errors.email = 'Valid email is required';
+        if (!formData.password || formData.password.length < 6) errors.password = 'Password must be at least 6 characters';
+        return errors;
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const errors = validateForm();
+        if(Object.keys(errors).length > 0) {
+            setFormErrors(errors);
+            return;
+        }
        try {
             dispatch(signInStart());
             const response = await fetch("/api/auth/sign-in", {
@@ -24,9 +36,10 @@ const Login = () => {
                     'Content-Type' :'application/json'
                  },
                  body: JSON.stringify(formData),
+                 credentials: 'include'
             });
             const data = await response.json();
-            if(data.success === false) {
+            if(!response.ok) {
                 dispatch(signInFailure(data));
                 return;
             }
@@ -51,6 +64,7 @@ const Login = () => {
                 className='bg-slate-100 p-3 rounded-lg'
                 onChange={handleChange}
             />
+            {formErrors.email && <p className="text-red-500">{formErrors.email}</p>}
             <input 
                 type="password"
                 placeholder='Password'
@@ -58,9 +72,10 @@ const Login = () => {
                 className='bg-slate-100 p-3 rounded-lg'
                 onChange={handleChange}
             />
+            {formErrors.password && <p className="text-red-500">{formErrors.password}</p>}
             <button 
                 disabled={loading}
-                className='bg-slate-700 text-white p-3
+                className='bg-black text-white p-3
                 rounded-lg uppercase hover:opacity-95
                 disabled:opacity-80'
             >

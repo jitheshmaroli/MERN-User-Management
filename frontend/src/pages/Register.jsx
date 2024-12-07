@@ -5,14 +5,28 @@ const Register = () => {
     const [formData, setFormData] = useState({});
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
+    const [formErrors, setFormErrors] = useState({});
     const navigate = useNavigate();
 
     const handleChange = (e) => {
         setFormData({...formData, [e.target.id] : e.target.value})
     }
 
+    const validateForm = () => {
+        let errors = {};
+        if (!formData.userName) errors.userName = 'Username is required';
+        if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) errors.email = 'Valid email is required';
+        if (!formData.password || formData.password.length < 6) errors.password = 'Password must be at least 6 characters';
+        return errors;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const errors = validateForm();
+        if(Object.keys(errors).length > 0) {
+            setFormErrors(errors);
+            return;
+        }
        try {
            setLoading(true);
            setError(false);
@@ -33,6 +47,7 @@ const Register = () => {
        } catch (error) {
             setLoading(false);
             setError(true);
+            console.log(error);
        }
     }
   return (
@@ -49,6 +64,7 @@ const Register = () => {
                 className='bg-slate-100 p-3 rounded-lg'
                 onChange={handleChange}
             />
+            {formErrors.userName && <p className="text-red-500">{formErrors.userName}</p>}
             <input 
                 type="email"
                 placeholder='Email'
@@ -56,6 +72,7 @@ const Register = () => {
                 className='bg-slate-100 p-3 rounded-lg'
                 onChange={handleChange}
             />
+            {formErrors.email && <p className="text-red-500">{formErrors.email}</p>}
             <input 
                 type="password"
                 placeholder='Password'
@@ -63,9 +80,10 @@ const Register = () => {
                 className='bg-slate-100 p-3 rounded-lg'
                 onChange={handleChange}
             />
+            {formErrors.password && <p className="text-red-500">{formErrors.password}</p>}
             <button 
                 disabled={loading}
-                className='bg-slate-700 text-white p-3
+                className='bg-black text-white p-3
                 rounded-lg uppercase hover:opacity-95
                 disabled:opacity-80'
             >

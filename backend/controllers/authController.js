@@ -3,15 +3,6 @@ import bcryptjs from "bcryptjs";
 import { errorHandler } from '../utills/error.js';
 import jwt from 'jsonwebtoken';
 
-
-export const home = async (req, res) => {
-    try {
-        res.send('hello world')
-    } catch (error) {
-        console.log('error loading home', error)
-    }
-};
-
 export const signUp = async (req, res, next) => {
     try {
         const {userName, email, password} = req.body;
@@ -35,7 +26,8 @@ export const singIn = async (req, res, next) => {
 
         if(!validPassword) return next(errorHandler(401, "Invalid user credentials"));
 
-        const token = jwt.sign({id: validUser._id}, process.env.JWT_SECRET);
+        const token = jwt.sign({id: validUser._id, isAdmin: validUser.isAdmin}, process.env.JWT_SECRET);
+
         const {password: hashedPassword, ...rest} = validUser._doc;
         const expiryDate = new Date(Date.now() + 3600000);
 

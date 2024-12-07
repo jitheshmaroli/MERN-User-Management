@@ -23,7 +23,7 @@ export const updateUser = async (req, res, next) => {
       req.params.id,
       {
         $set: {
-          username: req.body.username,
+          userName: req.body.userName,
           email: req.body.email,
           password: req.body.password,
           profilePicture: req.body.profilePicture,
@@ -47,6 +47,8 @@ export const deleteUser = async (req, res, next) => {
     return next(errorHandler(401, 'You can delete only your account!'));
   }
   try {
+    const adminCount = await User.countDocuments({isAdmin: true});
+    // if(adminCount === 1) return next(errorHandler(401, "Atleast on admin should be there"));
     await User.findByIdAndDelete(req.params.id);
     res.status(200).json('User has been deleted...');
   } catch (error) {

@@ -3,10 +3,10 @@ import dotenv from "dotenv";
 import db from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 import cookieParser from 'cookie-parser';
 import path from 'path';
 
-// import adminRoutes from "./routes/adminRoutes.js";
 
 
 const app = express();
@@ -24,7 +24,7 @@ const PORT = 3000;
 
 app.use('/api/user',userRoutes);
 app.use('/api/auth',authRoutes);
-// app.use('/api/admin',adminRoutes);
+app.use('/api/admin',adminRoutes);
 
 
 app.use((err, req, res, next) => {
